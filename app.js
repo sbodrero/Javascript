@@ -1,10 +1,23 @@
-
-
+    /**
+     * @description Represent an Animal
+     * @constructor
+     * @param {string} species
+     */
     function Animal(species) {
         this.species = species;
     }
 
-    // Create Dino Constructor
+    /**
+     * @description Represent a Dino
+     * @constructor
+     * @param {string} species
+     * @param {number} weight
+     * @param {number} height
+     * @param {string} diet
+     * @param {string} where
+     * @param {string} when
+     * @param {string} fact
+     */
     function Dino(species, weight, height, diet, where, when, fact) {
         Animal.call(this, species);
         this.weight = weight;
@@ -15,51 +28,90 @@
         this.fact = fact;
     }
 
+    /**
+     * @description Extends Animal prototype
+     * @type {Animal}
+     */
     Dino.prototype = Object.create(Animal.prototype);
 
-    // Create Human Object
+    /**
+     * @constructor Represent a Human
+     * @param {string} name
+     */
     function Human(name) {
-        Animal.call(this, 'Sapiens');
+        Animal.call(this, 'Human');
         this.name = name;
         this.getName = function() {
             return this.name;
         };
     }
 
+    /**
+     * @description Human Extends Animal prototype
+     * @type {Animal}
+     */
     Human.prototype = Object.create(Animal.prototype);
 
+    /**
+     * @description Animal species getter
+     * @returns {string}
+     */
     Animal.prototype.getSpecies = function() {
         return this.species;
     };
 
+    /**
+     * @description Dino weight getter
+     * @returns {string}
+     */
     Dino.prototype.getWeight = function() {
         return "It's weight is " +  this.weight + " lbs";
     };
 
+    /**
+     * @description Dino height getter
+     * @returns {string}
+     */
     Dino.prototype.getHeight = function() {
         return "It's height is " + this.height + " feets";
     };
 
+    /**
+     * @description Dino diet getter
+     * @returns {string}
+     */
     Dino.prototype.getDiet = function() {
         return "It's diet is " + this.diet;
     };
 
-    // Create Dino Compare Method 1
+    /**
+     * @description Dino where getter
+     * @returns {string}
+     */
     Dino.prototype.getWhere = function() {
         return "It comes from " + this.where;
     };
 
-    // Create Dino Compare Method 4
+    /**
+     * @description Dino whn getter
+     * @returns {string}
+     */
     Dino.prototype.getWhen = function() {
         return "It leaves in " + this.when;
     };
 
-    // Create Dino Compare Method 5
+    /**
+     * @description Dino fact getter
+     * @returns {string}
+     */
     Dino.prototype.getFact = function() {
         return this.fact;
     };
 
-    // Create Dino Objects
+    /**
+     * @description Fetch a list odf Dinos from json file
+     * @type {Array} allDinos
+     */
     const DinosList = (function getDinosFromJson() {
         let allDinos = [];
         fetch('dino.json') // Call the fetch function passing the url of the API as a parameter
@@ -77,10 +129,16 @@
                         ))
                     })
             })
-            .catch((e) => console.log(e.toString()));
+            .catch((e) => { /* TODO print error but no console allowed by rubric */ } );
         return allDinos;
     })();
 
+    /**
+     * @description Build a random fact
+     * @param {number} randomNumber
+     * @param {object} item
+     * @returns {string}
+     */
     function getDinoRandomFact(randomNumber, item) {
         switch (randomNumber) {
             case 1:
@@ -93,27 +151,46 @@
                 return item.getWhere();
             case 5:
                 return item.getWhen();
-            default:
+            case 6:
                 return item.getFact();
         }
     }
 
+    /**
+     * @description Get form name input value
+     * @returns {string}
+     */
     const getHumanData = function () {
         return document.getElementById('name').value
     };
 
+    /**
+     * @description Build a header node element
+     * @param item
+     * @returns {HTMLHeadingElement}
+     */
     function buildHeaderNode(item) {
         const gridItemHeader = document.createElement('h3');
         gridItemHeader.innerText = item.hasOwnProperty('name') ? item.getName() : item.getSpecies();
         return gridItemHeader;
     }
 
+    /**
+     * @description Build a paragraphe node element
+     * @param {string} innerText
+     * @returns {HTMLParagraphElement}
+     */
     function buildParagraphNode(innerText) {
         const paragraph = document.createElement('p');
         paragraph.innerText = innerText;
         return paragraph;
     }
 
+    /**
+     * @description Build an item grid element
+     * @param {object} item
+     * @returns {HTMLDivElement}
+     */
     function buildBox(item) {
         const gridItem = document.createElement('div');
         gridItem.classList.add('grid-item');
@@ -127,79 +204,105 @@
         gridItem.appendChild(img);
 
         const innerItemContent = buildMarkupFromSpecies(item);
-        if(Array.isArray(innerItemContent)) {
-            innerItemContent.map(content => gridItem.appendChild(content));
-        } else {
+        if(innerItemContent !== undefined) {
             gridItem.appendChild(innerItemContent);
         }
         return gridItem;
     }
 
+    /**
+     * @description Build a pigeon's fact
+     * @param {object} pigeon
+     * @returns {HTMLParagraphElement}
+     */
     function buildPigeonItem(pigeon) {
         return buildParagraphNode(pigeon.fact);
     }
 
+    /**
+     * @description Build a random Dino's fact
+     * @param {object} dino
+     * @returns {HTMLParagraphElement}
+     */
     function buildDinoItem(dino) {
-        let randomUniqueNumbers = [];
-        let facts = [];
-        while (randomUniqueNumbers.length < 2) {
-            const randomNumber = Math.floor(Math.random() * 5) + 1;
-            if (!randomUniqueNumbers.includes(randomNumber)) {
-                randomUniqueNumbers.push(randomNumber);
-                facts.push(buildParagraphNode(getDinoRandomFact(randomNumber, dino)));
-            }
-        }
-        facts.push(buildParagraphNode(dino.getFact()))
-        return facts;
+        const randomNumber = Math.floor(Math.random() * 6) + 1;
+        return buildParagraphNode(getDinoRandomFact(randomNumber, dino));
     }
 
-    function buildHumanItem(human) {
-        return buildHeaderNode(human.getName())
+    /**
+     * @description Build an empty Human's fact
+     * @returns {undefined}
+     */
+    function buildHumanItem() {
+        return undefined;
     }
 
+    /**
+     * @description Build html markup depending on object
+     * @param {object} item
+     * @returns {HTMLParagraphElement|*}
+     */
     const buildMarkupFromSpecies = function(item) {
         switch (item.getSpecies()) {
             case 'Pigeon':
                 return buildPigeonItem(item);
-            case 'Sapiens':
-                return buildHumanItem(item);
+            case 'Human':
+                return buildHumanItem();
             default:
                 return buildDinoItem(item)
         }
     };
 
-
-    // Generate Tiles for each Dino in Array
+    /**
+     * @description Generate ann Array of Dom grid item
+     * @param {Array} data
+     * @returns {HTMLDivElement[]}
+     */
     const generateTiles = function(data){
         return data.map(item => buildBox(item))
     };
 
-    // Add tiles to DOM
+    /**
+     * @description Attach grid elements to dom
+     * @param {array} tiles
+     */
     function addTilesToDom(tiles){
         const main = document.getElementById('grid');
         tiles.map(tile => main.appendChild(tile));
     }
 
-    // Remove form from screen
+    /**
+     * @description Remove Form from dom
+     */
     function removeFromOnSubmitButtonClick() {
         const form = document.getElementById('dino-compare');
         form.parentNode.removeChild(form);
     }
 
-    // On button click, prepare and display infographic
+    /**
+     *
+     * @param {Array} array
+     * @param {number} index
+     * @param elementsArray
+     */
+    function insertAt(array, index, ...elementsArray) {
+        array.splice(index, 0, ...elementsArray);
+    }
+
+    /**
+     * @description Select button as dom element
+     * @type {HTMLElement}
+     */
     const button = document.getElementById('btn');
 
-
+    /**
+     * @descriptionAttach event on button click
+     */
     button.addEventListener('click', function() {
         const human = new Human(getHumanData());
+        insertAt(DinosList, 4, human);
         const tileObjects = generateTiles(DinosList);
+
         removeFromOnSubmitButtonClick();
         addTilesToDom(tileObjects);
     });
-
-    /* fetch data
-    https://scotch.io/tutorials/how-to-use-the-javascript-fetch-api-to-get-data
-
-
-const result2 = dinos.slice(0,4).concat([human]).concat(dinos.slice(4,8))
-    */
