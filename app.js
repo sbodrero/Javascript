@@ -2,9 +2,15 @@
      * @description Represent an Animal
      * @constructor
      * @param {string} species
+     * @param {number} weight
+     * @param {number} height
+     * @param {string} diet
      */
-    function Animal(species) {
+    function Animal(species, weight, height, diet) {
         this.species = species;
+        this.weight = weight;
+        this.height = height;
+        this.diet = diet;
     }
 
     /**
@@ -19,10 +25,7 @@
      * @param {string} fact
      */
     function Dino(species, weight, height, diet, where, when, fact) {
-        Animal.call(this, species);
-        this.weight = weight;
-        this.height = height;
-        this.diet = diet;
+        Animal.call(this, species, weight, height, diet);
         this.where = where;
         this.when = when;
         this.fact = fact;
@@ -37,9 +40,12 @@
     /**
      * @constructor Represent a Human
      * @param {string} name
+     * @param {number} weight
+     * @param {number} height
+     * @param {string} diet
      */
-    function Human(name) {
-        Animal.call(this, 'Human');
+    function Human(name, weight, height, diet) {
+        Animal.call(this, 'Human', weight, height, diet);
         this.name = name;
         this.getName = function() {
             return this.name;
@@ -61,27 +67,27 @@
     };
 
     /**
-     * @description Dino weight getter
-     * @returns {string}
+     * @description Animal weight getter
+     * @returns {number}
      */
-    Dino.prototype.getWeight = function() {
-        return "It's weight is " +  this.weight + " lbs";
+    Animal.prototype.getWeight = function() {
+        return this.weight;
     };
 
     /**
-     * @description Dino height getter
-     * @returns {string}
+     * @description Animal height getter
+     * @returns {number}
      */
-    Dino.prototype.getHeight = function() {
-        return "It's height is " + this.height + " feets";
+    Animal.prototype.getHeight = function() {
+        return this.height;
     };
 
     /**
-     * @description Dino diet getter
+     * @description Animal diet getter
      * @returns {string}
      */
-    Dino.prototype.getDiet = function() {
-        return "It's diet is " + this.diet;
+    Animal.prototype.getDiet = function() {
+        return this.diet;
     };
 
     /**
@@ -138,16 +144,17 @@
      * @description Build a random fact
      * @param {number} randomNumber
      * @param {object} item
+     * @param {object} human
      * @returns {string}
      */
-    function getDinoRandomFact(randomNumber, item) {
+    function getDinoRandomFact(randomNumber, item, human) {
         switch (randomNumber) {
             case 1:
-                return item.getWeight();
+                return compareWeight(item.getWeight(), human.getWeight());
             case 2:
-                return item.getHeight();
+                return compareHeight(item.getHeight(), human.getHeight());
             case 3:
-                return item.getDiet();
+                return compareDiet(item.getDiet(), human.getDiet());
             case 4:
                 return item.getWhere();
             case 5:
@@ -157,12 +164,91 @@
         }
     }
 
+    //const getHeight = function()
+
     /**
      * @description Get form name input value
-     * @returns {string}
+     * @returns {object}
      */
     const getHumanData = function () {
-        return document.getElementById('name').value
+        const name = document.getElementById('name').value || 'Nobody';
+        const weight = document.getElementById('weight').value || 0;
+        const heightInFeets = document.getElementById('feet').value || 0;
+        const heightInInches = document.getElementById('inches').value || 0;
+        const height = heightInFeets * 12 + heightInInches;
+        const diet = document.getElementById('diet').value;
+        return { name, weight, height, diet };
+    };
+
+    /**
+     * @description Build sentence from equal property
+     * @param {string} prop
+     * @returns {string}
+     */
+    const getEqualSentence = function(prop){
+        return `It has the same ${prop} as human`;
+    };
+
+    /**
+     * @description Build sentence from diff property
+     * @param {number} value
+     * @param {string} prop
+     * @param {string} comparator
+     * @param {string} unit
+     * @returns {string}
+     */
+    const getCompareSentence = function(value, prop, comparator, unit) {
+        return `It's ${value} ${unit} ${comparator} ${prop} than human`
+    };
+
+    /**
+     * @description Compare Dino and human weight
+     * @param dinoWeigh
+     * @param humanWeight
+     * @returns {string}
+     */
+    const compareWeight = function(dinoWeigh, humanWeight) {
+        let diff;
+        if(dinoWeigh === humanWeight) {
+            return getEqualSentence('weight');
+        }
+        if(dinoWeigh < humanWeight) {
+            diff = humanWeight - dinoWeigh;
+            return getCompareSentence(diff, 'weight', 'less', 'lbs');
+        }
+        diff = dinoWeigh - humanWeight;
+        return getCompareSentence(diff, 'weight', 'more', 'lbs');
+    };
+
+    /**
+     * @description Compare dino and human height
+     * @param dinoHeight
+     * @param humanHeight
+     * @returns {string}
+     */
+    const compareHeight = function(dinoHeight, humanHeight){
+        let diff;
+        if(dinoHeight === humanHeight) {
+            return getEqualSentence('height');
+        }
+        if(dinoHeight < humanHeight) {
+            return getCompareSentence(diff, 'height', 'less', 'feets');
+        }
+        diff = dinoHeight - humanHeight;
+        return getCompareSentence(diff, 'height', 'more', 'feets');
+    };
+
+    /**
+     * @description Compare dino and human diet
+     * @param dinoDiet
+     * @param humanDiet
+     * @returns {string}
+     */
+    const compareDiet = function(dinoDiet, humanDiet) {
+        if(dinoDiet === humanDiet) {
+            return getEqualSentence('diet');
+        }
+        return "It's diet is different of the human's" ;
     };
 
     /**
@@ -190,9 +276,10 @@
     /**
      * @description Build an item grid element
      * @param {object} item
+     * @param {object} human
      * @returns {HTMLDivElement}
      */
-    function buildBox(item) {
+    function buildBox(item, human) {
         const gridItem = document.createElement('div');
         gridItem.classList.add('grid-item');
 
@@ -204,7 +291,7 @@
         img.src = 'images/' + imageName +'.png';
         gridItem.appendChild(img);
 
-        const innerItemContent = buildMarkupFromSpecies(item);
+        const innerItemContent = buildMarkupFromSpecies(item, human);
         if(innerItemContent !== undefined) {
             gridItem.appendChild(innerItemContent);
         }
@@ -223,11 +310,12 @@
     /**
      * @description Build a random Dino's fact
      * @param {object} dino
+     * @param {object} human
      * @returns {HTMLParagraphElement}
      */
-    function buildDinoItem(dino) {
+    function buildDinoItem(dino, human) {
         const randomNumber = Math.floor(Math.random() * 6) + 1;
-        return buildParagraphNode(getDinoRandomFact(randomNumber, dino));
+        return buildParagraphNode(getDinoRandomFact(randomNumber, dino, human));
     }
 
     /**
@@ -241,26 +329,28 @@
     /**
      * @description Build html markup depending on object
      * @param {object} item
+     * @param {object} human
      * @returns {HTMLParagraphElement|*}
      */
-    const buildMarkupFromSpecies = function(item) {
+    const buildMarkupFromSpecies = function(item, human) {
         switch (item.getSpecies()) {
             case 'Pigeon':
                 return buildPigeonItem(item);
             case 'Human':
                 return buildHumanItem();
             default:
-                return buildDinoItem(item)
+                return buildDinoItem(item, human)
         }
     };
 
     /**
      * @description Generate ann Array of Dom grid item
      * @param {Array} data
+     * @param {object} human
      * @returns {HTMLDivElement[]}
      */
-    const generateTiles = function(data){
-        return data.map(item => buildBox(item))
+    const generateTiles = function(data, human){
+        return data.map(item => buildBox(item, human))
     };
 
     /**
@@ -297,12 +387,14 @@
     const button = document.getElementById('btn');
 
     /**
-     * @descriptionAttach event on button click
+     * @description Attach event on button click
      */
     button.addEventListener('click', function() {
-        const human = new Human(getHumanData());
+        const data = getHumanData();
+        const { name, weight, height, diet } = data;
+        const human = new Human(name, weight, height, diet);
         insertAt(DinosList, 4, human);
-        const tileObjects = generateTiles(DinosList);
+        const tileObjects = generateTiles(DinosList, human);
 
         removeFromOnSubmitButtonClick();
         addTilesToDom(tileObjects);
