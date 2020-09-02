@@ -112,12 +112,13 @@
      * @description Fetch a list odf Dinos from json file
      * @type {Array} allDinos
      */
-    const DinosList = (function getDinosFromJson() {
+    const DinosList = (function() {
         let allDinos = [];
         fetch('dino.json') // Call the fetch function passing the url of the API as a parameter
             .then(response => response.json())
             .then(dinos => {
-                dinos.Dinos.map(dino => {
+                const { Dinos } = dinos;
+                Dinos.map(dino => {
                     allDinos.push( new Dino(
                             dino.species,
                             dino.weight,
@@ -129,7 +130,7 @@
                         ))
                     })
             })
-            .catch((e) => { /* TODO print error but no console allowed by rubric */ } );
+            .catch(() => { /* TODO print error but no console allowed by rubric */ } );
         return allDinos;
     })();
 
